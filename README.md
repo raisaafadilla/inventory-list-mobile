@@ -160,5 +160,305 @@ class ShopCard extends StatelessWidget {
 }
 ```
 
+## Assignment 8
 
+**The difference between ```Navigator.push()``` and ```Navigator.pushReplacement()```.**
+
+```Navigator.push()``` is used to add a route to be displayed to the user by adding a new page to the navigation stack without removing the previous route. This allows the user to go back to the previous page. For example :
+```
+Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ),
+              );
+```
+
+While, ```Navigator.pushReplacement()``` is used to add a route to be displayed to the user by replacing the current page the user is visiting with a new page on the navigation stack. This prevents the user from going back to the previous page. For example :
+```
+Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ),
+              );
+```
+
+**Layout widget in Flutter.**
+
+1. Drawer: This widget is used to create a slide-in menu that typically appears from the left side of the screen.
+2. ListView: A widget used to display child widgets in a scrollable list.
+3. DrawerHeader: This widget is used to holding descriptive details such as titles and images.
+4. Column: This widget is used to vertically organize and stack widgets within a user interface.
+5. Text Widgets: A widget used to show and style text in the app's user interface.
+6. Padding: A widget used to set padding or empty space around a child widget.
+7. Material: A widget used to makes things look nice and interactive, adding shadows and ripples, following a design style called Material Design.
+8. InkWell: This widget is used to makes widgets react when touched.
+9. Container: A widget that combines common widgets for drawing, setting placement, and determining size.
+10. Center: This widget is used to places its child widget right at the center, making sure it's perfectly aligned both horizontally and vertically.
+
+**The form input elements that used in this assignment.**
+
+In this assignment, I utilized a text input element, namely TextFormField, which serves as a text input field allowing users to input text. It automatically manages various tasks related to text input, such as capturing input, displaying error messages, and providing various validation features.
+
+**The implementation of Clean Architecture in a Flutter application.**
+
+In Flutter, Clean Architecture involves organizing code into three layers:
+1. Presentation Layer : It contains UI components and communicates with the domain layer for data.
+2. Domain Layer : It defines business logic and use cases, maintaining independence and reusability.
+3. Data Layer : It manages data sources and repositories.
+
+That layers is used to improve modularity, maintainability, and testability. This separation of concerns is designed to enhance the codebase's scalability and adaptability to modifications.
+
+**How I Implemented this Assignment**
+
+1. Create one new page in the application, a page for adding a new item.
+
+I created a new file named ```shoplist_form.dart``` in a new folder called ```screens``` within the ```lib``` directory. The TextFormField used will be created to receive three input elements: name, amount, and description.
+```
+children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Item Name",
+                    labelText: "Item Name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _name = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Name cannot be empty!";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Amount",
+                    labelText: "Amount",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _amount = int.parse(value!);
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Amount cannot be empty!";
+                    }
+                    if (int.tryParse(value) == null) {
+                      return "Amount must be a number!";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Description",
+                    labelText: "Description",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _description = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return "Description cannot be empty!";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+```
+
+Next, I added the save button.
+```
+child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(Colors.indigo),
+                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Product successfully saved'),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Name: $_name'),
+                                    Text('Amount: $_amount'),
+                                    Text('Description: $_description'),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        _formKey.currentState!.reset();
+                      }
+                    },
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+```
+
+2. Direct users to the new item addition form page when clicking the Add Item button on the main page.
+
+I added the code below in ```shop_card.dart``` file.
+```
+// Navigate to the appropriate route (depending on the button type)
+          if (item.name == "Add Item") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => ShopFormPage()),
+            );
+          }
+```
+
+3. Display data as entered in the form in a pop-up after clicking the Save button on the new item addition page.
+
+I added the code below in ```shoplist_form.dart``` inside the ```screens``` folder.
+```
+onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Product successfully saved'),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Name: $_name'),
+                                    Text('Amount: $_amount'),
+                                    Text('Description: $_description'),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: const Text('OK'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        _formKey.currentState!.reset();
+                      }
+                    },
+```
+
+4. Create a drawer in the application.
+
+I made a new file called ```left_drawer.dart``` inside ```lib/widgets``` folder.
+```import 'package:flutter/material.dart';
+import 'package:inventory_list_mobile/screens/menu.dart';
+import 'package:inventory_list_mobile/screens/shoplist_form.dart';
+
+class LeftDrawer extends StatelessWidget {
+  const LeftDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.indigo,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Inventory List',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Padding(padding: EdgeInsets.all(10)),
+                Text(
+                  "Write all your list needs here!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text('Home Page'),
+            // Redirect to MyHomePage
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyHomePage(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.add_shopping_cart),
+            title: const Text('Add Items'),
+            // Redirect to ShopFormPage
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShopFormPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
 
