@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:inventory_list_mobile/screens/menu.dart';
 import 'package:inventory_list_mobile/widgets/left_drawer.dart';
 
 class ShopFormPage extends StatefulWidget {
@@ -16,6 +20,7 @@ class _ShopFormPageState extends State<ShopFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -114,36 +119,37 @@ class _ShopFormPageState extends State<ShopFormPage> {
                       backgroundColor:
                           MaterialStateProperty.all(Colors.indigo),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Product successfully saved'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Name: $_name'),
-                                    Text('Amount: $_amount'),
-                                    Text('Description: $_description'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                        _formKey.currentState!.reset();
-                      }
+                    onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                            // Send request to Django and wait for the response
+                            // TODO: Change the URL to your Django app's URL. Don't forget to add the trailing slash (/) if needed.
+                            final response = await request.postJson(
+                            "http://127.0.0.1:8000/create-flutter/",
+                              jsonEncode(<String, String>{
+                                  'name': _name,
+                                  // 'price': _price.toString(),
+                                  'amount': _amount.toString(),
+                                  'description': _description
+                                  // TODO: Adjust the fields with your Django model
+                              }));
+                            if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                content: Text("New product has saved successfully!"),
+                                ));
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                                );
+                            } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                    content:
+                                        Text("Something went wrong, please try again."),
+                                ));
+                            }
+                          _formKey.currentState!.reset();
+                        }
                     },
                     child: const Text(
                       "Save",
