@@ -462,3 +462,22 @@ class LeftDrawer extends StatelessWidget {
 }
 ```
 
+## Assignment 9
+
+**Can we retrieve JSON data without creating a model first? If yes, is it better than creating a model before retrieving JSON data?**
+
+Yes, we can retrieve JSON data without creating model first. Nevertheless, the code is more understandable and manageable when a model is created because it aids in organising and comprehending the data structure.
+
+**The function of CookieRequest**
+
+CookieRequest is responsible for managing user authentication and handling HTTP requests when using Django backends in Flutter apps. It addresses authentication tokens, sessions, and cookies. Sharing one CookieRequest instance across components avoids inconsistent data by ensuring consistent authentication across the application.
+
+**The mechanism of fetching data from JSON until it can be displayed on Flutter**
+
+Fetching data involves making an HTTP request, typically using ```http.get``` to a specified URL. The received JSON string is then parsed into a Dart object, making it accessible and usable in the program. To facilitate easier data manipulation, the JSON data is often converted into a predefined model based on the structure of the model created earlier. This process is essential for efficient data processing. The obtained data can be directly displayed or undergo various logical operations within the Flutter application. For instance, a ```ListView.builder``` can be employed to exhibit a list of data.
+
+**The authentication mechanism from entering account data on Flutter to Django authentication completion and the display of menus on Flutter**
+
+**The widgets that used in this assignment**
+
+**How I Implemented this Assignment**
